@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: jimmy-racing
+    runtime: node
+    plan: free
+    buildCommand: node tools/build.js
+    startCommand: node server/server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production

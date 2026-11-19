@@ -1,0 +1,45 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000;overflow:hidden}canvas{width:100vw;height:100vh;display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script src="../src/core/util.js"></script><script src="../src/core/track.js"></script><script src="../src/core/vehicle.js"></script>
+<script src="../src/core/ai.js"></script><script src="../src/core/sim.js"></script>
+<script src="../src/render/gl.js"></script><script src="../src/render/shaders.js"></script><script src="../src/render/env.js"></script>
+<script src="../src/render/textures.js"></script><script src="../src/render/renderer.js"></script><script src="../src/render/world.js"></script><script src="../src/render/features.js"></script><script src="../src/render/cars_gfx.js"></script>
+<script>
+window.devErrors = [];
+window.addEventListener('error', function (e) { window.devErrors.push(String(e.message) + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno); });
+window.boot = function (o) {
+  o = o || {};
+  var t0 = performance.now();
+  var JR = window.JR, cv = document.getElementById('c');
+  window.track = JR.track.build();
+  window.R = new JR.Renderer(cv, o.quality || 'high', { preserve: true });
+  R.setViewport(window.innerWidth, window.innerHeight, 1);
+  window.world = new JR.World(R, track);
+  R.addLayer(world);
+  window.bootMs = performance.now() - t0;
+  return { bootMs: bootMs, texMs: R.tex.timeMs, buildMs: world.buildMs, gpu: R.eng.gpu };
+};
+window.shot = function (o) {
+  var JR = window.JR;
+  R.env = JR.env.make(o.time || 'noon', o.weather || 'clear');
+  if (world.updateEnv) world.updateEnv(R.env);
+  var p = track.pointAt(o.s || 0, o.d || 0);
+  if (o.cars) {
+    if (!window.cg) { window.cg = new JR.CarsGfx(R); R.addLayer({ prepare: function (r, dt) { cg.update(r, dt); } });
+      ['vortex', 'falcon', 'titan'].forEach(function (id, n) {
+        var spec = JR.vehicle.CARS[id], q = track.pointAt((o.s || 0) + 6 + n * 0, (n - 1) * 4.2 * (o.spread == null ? 1 : o.spread));
+        var v = { x: q.x, y: q.y, z: q.z, heading: q.heading + (o.carYaw || 0), pitch: 0.01, roll: 0.0, heave: 0, steerAngle: o.steer || 0, wheelAngle: [0, 0, 0, 0], brake: o.brake || 0, airborne: false, pitchGround: 0 };
+        cg.add({ spec: spec, color: spec.color, vehicle: v, damageZones: { front: o.dmg || 0, rear: o.dmg || 0, left: 0, right: o.dmg || 0 }, input: { brake: o.brake || 0 } });
+      }); }
+    cg.nightLights = (o.time === 'night');
+  }
+  var h = p.heading + (o.yaw || 0);
+  var back = o.back == null ? 9 : o.back, ht = o.h == null ? 3.2 : o.h;
+  var cx = p.x - Math.sin(h) * back, cz = p.z - Math.cos(h) * back;
+  var tx = p.x + Math.sin(h) * 30, tz = p.z + Math.cos(h) * 30;
+  R.setCamera([cx, p.y + ht, cz], [tx, p.y + (o.ty == null ? 1.2 : o.ty), tz], [0, 1, 0], o.fov || 60, 0);
+  for (var i = 0; i < (o.frames || 2); i++) R.render(1 / 60);
+  R.gl.finish();
+  return { draws: R.stats.draws, tris: R.stats.tris, errors: window.devErrors };
+};
+</script></body></html>

@@ -1,0 +1,14 @@
+{
+  "name": "jimmy-racing",
+  "version": "1.0.0",
+  "description": "JIMMY RACING - juego de carreras 3D (WebGL2) con multijugador online. Servidor Node sin dependencias.",
+  "private": true,
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "build": "node tools/build.js",
+    "test": "node tests/ws.test.js && node tests/vehicle.test.js && node tests/race.test.js && node tests/obstacles.test.js && node tests/items.test.js && node tests/tunnel.test.js && node tests/levels.test.js && node tests/crash.test.js && node tests/net.test.js && node tests/net5.test.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {}
+}

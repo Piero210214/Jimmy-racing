@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Jimmy Racing</title>
+<style>
+:root{--red:#e8412c;--ink:#0b0d12;--panel:rgba(10,12,18,.82);--tx:#eef1f7;--mu:#98a1b5}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#05060a;color:var(--tx);font-family:"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;user-select:none}
+canvas{position:fixed;left:0;top:0;display:block}#hud{pointer-events:none}
+.ui{position:fixed;inset:0;display:flex;align-items:center;padding:0 4vw;overflow:auto}.ui.empty{display:none}
+.ui.loading,.ui.pause,.ui.qualiSummary,.ui.results,.ui.ttSummary{justify-content:center;background:rgba(3,4,8,.55);backdrop-filter:blur(3px)}
+.ui.loading{background:#05060a;backdrop-filter:none}.ui.podium{align-items:flex-end;justify-content:center;padding-bottom:24px;pointer-events:none}.ui.podium .podiumbar{pointer-events:auto}
+.ui.main,.ui.setup,.ui.settings,.ui.controls{background:linear-gradient(90deg,rgba(4,5,9,.92) 0%,rgba(4,5,9,.7) 38%,rgba(4,5,9,0) 70%)}
+.panel{padding:28px 32px;border-radius:14px;min-width:330px;max-width:94vw;max-height:94vh;overflow:auto}
+.panel.left{background:transparent;padding-left:0}.panel.wide{min-width:min(560px,92vw)}.panel.center2{background:var(--panel);border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center}
+.logo{font:italic 900 clamp(40px,6vw,76px)/0.95 "Segoe UI",Arial;letter-spacing:-1px;text-transform:uppercase}.logo b{display:block;color:var(--red)}.logo.small{font-size:44px;margin-bottom:24px}
+.tag{color:var(--mu);margin:6px 0 26px}h2{margin:0 0 14px;font:italic 800 30px "Segoe UI",Arial;text-transform:uppercase}h3{margin:6px 0 14px;font-weight:600;color:var(--mu)}
+button{font:700 15px "Segoe UI",Arial;color:var(--tx);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:11px 20px;cursor:pointer;transition:.12s;text-transform:uppercase;letter-spacing:.5px}
+button:hover{background:rgba(255,255,255,.18);transform:translateX(2px)}button.big{display:block;width:290px;margin:0 0 10px;text-align:left;padding:15px 20px;font-size:17px;border-left:4px solid var(--red)}
+button.go{background:var(--red);border-color:var(--red)}button.go:hover{background:#ff5a42}.center2 button.big{margin:0 auto 10px;text-align:center;border-left:1px solid rgba(255,255,255,.16)}
+.btns{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;justify-content:inherit}.hint{color:var(--mu);font-size:13px;max-width:520px}
+.cars{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}button.car{display:flex;flex-direction:column;align-items:flex-start;text-transform:none;width:170px;padding:10px 12px}button.car small{font-weight:400;color:var(--mu);margin-top:3px;font-size:11.5px;line-height:1.25}button.car.on{border-color:var(--red);background:rgba(232,65,44,.2)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-bottom:12px;font-size:13px;color:var(--mu)}.stats .spec{grid-column:1/3;color:#c9d0de}.bar{display:block;height:6px;background:rgba(255,255,255,.12);border-radius:3px;margin-top:3px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#39d0ff,#fff)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}.row label{color:#c9d0de;font-size:14px}.ctl{display:flex;align-items:center;gap:8px}
+select,input[type=range]{font:600 14px "Segoe UI",Arial;color:var(--tx);background:#161a24;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:6px 8px;min-width:150px}input[type=range]{padding:0;min-width:180px;accent-color:var(--red)}input[type=checkbox]{width:20px;height:20px;accent-color:var(--red)}
+.paints{display:flex;gap:6px}button.sw{width:26px;height:26px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.25)}button.sw.on{border-color:#fff;box-shadow:0 0 0 2px var(--red)}button.sw:hover{transform:scale(1.12)}
+.tbl{width:100%;border-collapse:collapse;margin:8px 0 6px;font-variant-numeric:tabular-nums}.tbl th{color:var(--mu);font-size:12px;text-transform:uppercase;text-align:left;padding:6px 10px}.tbl td{padding:7px 10px;border-top:1px solid rgba(255,255,255,.07);text-align:left}.tbl tr.me td{background:rgba(232,65,44,.22);font-weight:700}
+.keys{width:100%;border-collapse:collapse}.keys td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.07)}kbd{background:#1b2030;border:1px solid #394057;border-radius:5px;padding:2px 8px;font:600 13px Consolas,monospace}
+.banner{font:italic 900 clamp(44px,8vw,92px)/1 "Segoe UI",Arial;letter-spacing:2px;margin-bottom:4px}.banner.win{color:#ffd23f;text-shadow:0 0 40px rgba(255,210,63,.55)}.banner.pod{color:#e6e9f0}.banner.lose{color:#ff6b5e}
+.load{width:min(420px,70vw);height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin:0 auto 14px}.load i{display:block;height:100%;width:3%;background:var(--red);transition:width .3s}
+.center{text-align:center;margin:auto}.podiumbar{display:flex;gap:10px}.val{min-width:44px;color:var(--mu)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#888}.dot.ok{background:#4be37a;box-shadow:0 0 8px #4be37a}.dot.warn{background:#ffd23f}.dot.bad{background:#ff4a3d}.netstat{color:var(--mu);margin:0 0 10px}
+.txt{font:600 15px "Segoe UI",Arial;color:var(--tx);background:#161a24;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:8px 10px;min-width:150px;user-select:text}.txt.code{width:110px;text-transform:uppercase;letter-spacing:4px;text-align:center;margin-right:8px}
+.camp{max-height:92vh;overflow:auto;min-width:min(900px,94vw)}.lvls{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin:8px 0}.lvl{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:5px}.lvl.lock{opacity:.5}.lvl.done{border-color:#3ec46d}.lvl .lh{display:flex;justify-content:space-between;gap:8px}.lvl .stars{color:#ffd23f;letter-spacing:2px}.lvl ul{margin:2px 0 2px 16px;padding:0;font-size:12px}.campres{margin:8px 0;text-align:left}.campres ul{list-style:none;padding:0;margin:4px 0}
+.rooms{margin:4px 0}.roomrow{display:flex;align-items:center;gap:14px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}.roomrow b{letter-spacing:3px;min-width:70px}.roomrow span{flex:1;color:var(--mu);font-size:13px}
+.err{color:#ff7a6b;margin:10px 0 0}.roomcode{color:var(--red);letter-spacing:5px}.pdot{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4)}.rdy{color:#4be37a}button:disabled{opacity:.4;cursor:not-allowed}
+.ui.online,.ui.lobby{background:linear-gradient(90deg,rgba(4,5,9,.92) 0%,rgba(4,5,9,.7) 48%,rgba(4,5,9,0) 78%)}.ui.oresults,.ui.pauseO{justify-content:center;background:rgba(3,4,8,.55);backdrop-filter:blur(3px)}
+@media(max-width:700px){.ui{padding:0 12px}button.big{width:100%}}
+</style></head>
+<body><canvas id="c"></canvas><canvas id="hud"></canvas><div id="ui" class="ui"></div>
+<script>/*SCRIPTS*/</script>
+<script>try{var g=new JRGame();window.game=g;g.boot();}catch(e){document.getElementById('ui').innerHTML='<div class="center"><p>Error: '+e.message+'</p></div>';}</script>
+</body></html>
